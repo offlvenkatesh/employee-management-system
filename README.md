@@ -2,13 +2,15 @@
 
 A full-stack Employee Management System built for the Full Stack Developer hiring assignment.
 
-## Stack
+Repository: `https://github.com/offlvenkatesh/employee-management-system`
+
+## Tech Stack
 
 - Frontend: React, TypeScript, Vite, Tailwind CSS, React Query, Recharts
 - Backend: Node.js, Express, TypeScript, Mongoose
 - Database: MongoDB
 - Authentication: JWT and bcrypt password hashing
-- Deployment: Docker Compose for MongoDB, API, and frontend
+- Deployment: Docker Compose, Vercel-ready frontend/backend configuration
 
 ## Features
 
@@ -57,9 +59,30 @@ Then open:
 
 The Docker server starts with `SEED_ON_START=true`, so demo accounts are created automatically.
 
+## How To Run Locally
+
+Backend and frontend are managed as npm workspaces from the project root.
+
+```bash
+npm install
+docker run --name ems-mongo -p 27017:27017 -d mongo:7
+npm run seed
+npm run dev
+```
+
+Local URLs:
+
+- Frontend: `http://localhost:5173`
+- Backend API: `http://localhost:4000`
+
 ## Vercel Deployment
 
-The repository includes `vercel.json` and a serverless Express adapter at `api/index.ts`. On Vercel, the React app is served from `client/dist` and `/api/*` is rewritten to the API function.
+The repository includes Vercel configuration for both common deployment styles.
+
+- Full-stack single project from repository root: uses root `vercel.json`, serves `client/dist`, and rewrites `/api/*` to `api/index.ts`.
+- Backend-only project from root directory `server`: uses `server/vercel.json` and `server/api/index.ts` for the Express serverless function.
+
+For frontend-only Vercel deployment, select root directory `client`, framework `Vite`, build command `npm run build`, output directory `dist`, and set `VITE_API_URL` to the deployed backend URL.
 
 Required Vercel environment variables for a full live deployment:
 
@@ -73,38 +96,14 @@ Required Vercel environment variables for a full live deployment:
 
 `VITE_API_URL` can be omitted on Vercel because the frontend uses same-origin `/api` calls in production.
 
-## Local Development
-
-1. Install dependencies.
-
-```bash
-npm install
-```
-
-2. Copy env examples if you want to override defaults.
+Copy env examples if you want to override local defaults.
 
 ```bash
 cp server/.env.example server/.env
 cp client/.env.example client/.env
 ```
 
-3. Start MongoDB locally or with Docker.
-
-```bash
-docker run --name ems-mongo -p 27017:27017 -d mongo:7
-```
-
-4. Seed demo data.
-
-```bash
-npm run seed
-```
-
-5. Start both apps.
-
-```bash
-npm run dev
-```
+Important: for a working live backend on Vercel, use a hosted MongoDB database such as MongoDB Atlas. `localhost` MongoDB only works on your local machine.
 
 ## Verification Commands
 
@@ -115,19 +114,43 @@ npm test
 
 ## Screenshots
 
+- Login page: `docs/screenshots/login.png`
 - Dashboard: `docs/screenshots/dashboard.png`
-- Employee management: `docs/screenshots/employees.png`
+- Employee list: `docs/screenshots/employees.png`
+- Add employee form: `docs/screenshots/add-employee.png`
 - Organization hierarchy: `docs/screenshots/organization.png`
+
+### Login Page
+
+![Login page](docs/screenshots/login.png)
+
+### Dashboard
+
+![Dashboard](docs/screenshots/dashboard.png)
+
+### Employee List
+
+![Employee list](docs/screenshots/employees.png)
+
+### Add Employee Form
+
+![Add employee form](docs/screenshots/add-employee.png)
+
+### Organization Hierarchy
+
+![Organization hierarchy](docs/screenshots/organization.png)
 
 ## Project Structure
 
 ```text
 client/
+  # Frontend React application
   src/components/       Reusable UI components
   src/pages/            Dashboard, Employees, Organization, Profile, Login
   src/providers/        Auth provider
   src/lib/              API client and token storage
 server/
+  # Backend Express API
   src/auth/             Login, JWT auth middleware, RBAC helpers
   src/employees/        Employee model, validation, controller, service
   src/organization/     Reporting tree and cycle detection
@@ -136,6 +159,28 @@ server/
   src/scripts/          Seed data
 docs/API.md             API documentation
 ```
+
+## API Documentation
+
+Detailed API documentation is available in `docs/API.md`.
+
+Quick endpoint summary:
+
+| Method | Endpoint | Description | Auth |
+| --- | --- | --- | --- |
+| `POST` | `/api/auth/login` | Login user and return JWT | Public |
+| `POST` | `/api/auth/logout` | Logout current user | Protected |
+| `GET` | `/api/auth/me` | Get current user profile | Protected |
+| `GET` | `/api/dashboard/stats` | Dashboard totals and chart data | Protected |
+| `GET` | `/api/employees` | List employees with search/filter/sort/pagination | Protected |
+| `POST` | `/api/employees` | Create employee | Super Admin, HR Manager |
+| `GET` | `/api/employees/:id` | Get employee details | Protected |
+| `PUT` | `/api/employees/:id` | Update employee | Role scoped |
+| `DELETE` | `/api/employees/:id` | Soft delete employee | Super Admin |
+| `POST` | `/api/employees/import` | Import employees from CSV | Super Admin, HR Manager |
+| `GET` | `/api/employees/:id/reportees` | Show direct reports | Protected |
+| `PATCH` | `/api/employees/:id/manager` | Assign reporting manager | Super Admin, HR Manager |
+| `GET` | `/api/organization/tree` | Show reporting hierarchy tree | Protected |
 
 ## RBAC Rules
 
