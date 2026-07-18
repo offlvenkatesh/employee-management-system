@@ -77,10 +77,10 @@ Local URLs:
 
 ## Vercel Deployment
 
-The repository includes Vercel configuration for both common deployment styles.
+The repository includes Vercel configuration for separate frontend and backend projects.
 
-- Full-stack single project from repository root: uses root `vercel.json`, serves `client/dist`, and rewrites `/api/*` to `api/index.ts`.
-- Backend-only project from root directory `server`: uses `server/vercel.json` and `server/api/index.ts` for the Express serverless function.
+- Frontend project from root directory `client`: uses `client/vercel.json`, serves `dist`, and rewrites SPA routes to `index.html`.
+- Backend project from root directory `server`: uses `server/vercel.json` and `server/api/index.ts` for the Express serverless function.
 
 For frontend-only Vercel deployment, select root directory `client`, framework `Vite`, build command `npm run build`, output directory `dist`, and set `VITE_API_URL` to the deployed backend URL.
 
