@@ -17,6 +17,10 @@ async function bootstrapOnce(): Promise<void> {
 }
 
 export default async function handler(req: Request, res: Response) {
+  if (req.url === "/health" || req.url === "/ready") {
+    return app(req, res);
+  }
+
   await bootstrapOnce();
   return app(req, res);
 }
