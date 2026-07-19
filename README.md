@@ -188,8 +188,4 @@ Quick endpoint summary:
 - HR Manager: can create/edit/view employees and import CSV, cannot delete employees or assign Super Admin role.
 - Employee: can view and edit only their own limited profile fields: phone and profile image.
 
-## Notes
 
-- Delete is implemented as soft delete by setting `isDeleted=true` and `status=INACTIVE`.
-- Logout is stateless for JWT and clears the client token.
-- For a production system, replace the demo JWT secret, use HTTPS, and move auth persistence to an httpOnly refresh-token flow.
