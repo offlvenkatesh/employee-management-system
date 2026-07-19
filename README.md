@@ -88,11 +88,12 @@ Required Vercel environment variables for a full live deployment:
 
 | Variable | Value |
 | --- | --- |
-| `MONGO_URI` | MongoDB Atlas connection string |
+| `MONGO_URI` | MongoDB Atlas connection string for persistent deployments |
 | `JWT_SECRET` | Long random production secret |
 | `JWT_EXPIRES_IN` | Example: `8h` |
 | `CLIENT_ORIGIN` | Your Vercel deployment URL |
 | `SEED_ON_START` | `true` for demo accounts, otherwise `false` |
+| `DEMO_MODE` | `true` to use the in-memory seeded demo backend without MongoDB |
 
 `VITE_API_URL` can be omitted on Vercel because the frontend uses same-origin `/api` calls in production.
 
@@ -103,7 +104,7 @@ cp server/.env.example server/.env
 cp client/.env.example client/.env
 ```
 
-Important: for a working live backend on Vercel, use a hosted MongoDB database such as MongoDB Atlas. `localhost` MongoDB only works on your local machine.
+Important: for a persistent live backend on Vercel, use a hosted MongoDB database such as MongoDB Atlas. If you cannot use hosted MongoDB, set `DEMO_MODE=true` for a seeded in-memory demo. Demo mode is non-persistent and can reset on redeploys or serverless cold starts.
 
 ## Verification Commands
 

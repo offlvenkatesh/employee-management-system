@@ -1,4 +1,6 @@
 import type { AuthenticatedUser } from "../types/express";
+import { config } from "../config/env";
+import { getDemoOrganizationTree } from "../demo/demo-store";
 import { EmployeeModel } from "../employees/employee.model";
 import { toEmployeeResponse, type EmployeeResponse } from "../employees/employee.serializer";
 
@@ -32,6 +34,8 @@ export function wouldCreateCircularReporting(
 }
 
 export async function getOrganizationTree(actor: AuthenticatedUser): Promise<OrganizationNode[]> {
+  if (config.demoMode) return getDemoOrganizationTree(actor);
+
   const employees = await EmployeeModel.find({ isDeleted: false }).sort({ name: 1 }).lean();
   const nodes = new Map<string, OrganizationNode>();
 

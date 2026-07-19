@@ -1,6 +1,15 @@
 import bcrypt from "bcryptjs";
 import { Types, type FilterQuery, type SortOrder } from "mongoose";
 import { config } from "../config/env";
+import {
+  createDemoEmployee,
+  getDemoDirectReportees,
+  getDemoEmployeeResponseById,
+  listDemoEmployees,
+  softDeleteDemoEmployee,
+  updateDemoEmployee,
+  updateDemoEmployeeManager
+} from "../demo/demo-store";
 import type { AuthenticatedUser } from "../types/express";
 import { BadRequestError, ConflictError, ForbiddenError, NotFoundError } from "../shared/errors";
 import type { Role } from "../shared/roles";
@@ -93,6 +102,8 @@ async function wouldCreateCycleFromDatabase(employeeId: string, managerId: strin
 }
 
 export async function listEmployees(query: EmployeeQueryInput, actor: AuthenticatedUser): Promise<PaginatedEmployees> {
+  if (config.demoMode) return listDemoEmployees(query, actor);
+
   const filter: FilterQuery<Employee> = { isDeleted: false };
 
   if (actor.role === "EMPLOYEE") {
@@ -132,6 +143,8 @@ export async function listEmployees(query: EmployeeQueryInput, actor: Authentica
 }
 
 export async function getEmployeeById(id: string, actor: AuthenticatedUser): Promise<EmployeeResponse> {
+  if (config.demoMode) return getDemoEmployeeResponseById(id, actor);
+
   ensureEmployeeOwnProfileOnly(actor, id);
   const employee = await EmployeeModel.findOne({ _id: id, isDeleted: false })
     .populate("reportingManager", "name employeeId")
@@ -141,6 +154,8 @@ export async function getEmployeeById(id: string, actor: AuthenticatedUser): Pro
 }
 
 export async function createEmployee(input: EmployeeCreateInput, actor: AuthenticatedUser): Promise<EmployeeResponse> {
+  if (config.demoMode) return createDemoEmployee(input, actor);
+
   ensureElevated(actor);
   ensureCanAssignRole(actor, input.role);
   await assertUniqueEmployee(input);
@@ -160,6 +175,8 @@ export async function updateEmployee(
   input: EmployeeUpdateInput,
   actor: AuthenticatedUser
 ): Promise<EmployeeResponse> {
+  if (config.demoMode) return updateDemoEmployee(id, input, actor);
+
   assertEmployeeUpdateScope(actor, id, input);
   if (actor.role !== "EMPLOYEE") ensureElevated(actor);
   ensureCanAssignRole(actor, input.role);
@@ -192,6 +209,11 @@ export async function updateEmployee(
 }
 
 export async function softDeleteEmployee(id: string, actor: AuthenticatedUser): Promise<void> {
+  if (config.demoMode) {
+    softDeleteDemoEmployee(id, actor);
+    return;
+  }
+
   if (actor.role !== "SUPER_ADMIN") {
     throw new ForbiddenError("Only a Super Admin can delete employees");
   }
@@ -211,6 +233,8 @@ export async function updateEmployeeManager(
   managerId: string | null,
   actor: AuthenticatedUser
 ): Promise<EmployeeResponse> {
+  if (config.demoMode) return updateDemoEmployeeManager(id, managerId, actor);
+
   ensureElevated(actor);
   const employee = await EmployeeModel.findOne({ _id: id, isDeleted: false });
   if (!employee) throw new NotFoundError("Employee");
@@ -230,6 +254,8 @@ export async function updateEmployeeManager(
 }
 
 export async function getDirectReportees(id: string, actor: AuthenticatedUser): Promise<EmployeeResponse[]> {
+  if (config.demoMode) return getDemoDirectReportees(id, actor);
+
   ensureEmployeeOwnProfileOnly(actor, id);
   const employee = await EmployeeModel.exists({ _id: id, isDeleted: false });
   if (!employee) throw new NotFoundError("Employee");

@@ -1,9 +1,13 @@
 import type { FilterQuery } from "mongoose";
+import { config } from "../config/env";
+import { getDemoDashboardStats } from "../demo/demo-store";
 import type { AuthenticatedUser } from "../types/express";
 import { EmployeeModel, type Employee } from "../employees/employee.model";
 import { toEmployeeResponse } from "../employees/employee.serializer";
 
 export async function getDashboardStats(actor: AuthenticatedUser) {
+  if (config.demoMode) return getDemoDashboardStats(actor);
+
   const baseFilter: FilterQuery<Employee> = { isDeleted: false };
   if (actor.role === "EMPLOYEE") baseFilter._id = actor.id;
 

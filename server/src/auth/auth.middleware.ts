@@ -1,6 +1,7 @@
 import type { NextFunction, Request, Response } from "express";
 import jwt from "jsonwebtoken";
 import { config } from "../config/env";
+import { getDemoAuthenticatedUser } from "../demo/demo-store";
 import { EmployeeModel } from "../employees/employee.model";
 import { ForbiddenError, UnauthorizedError } from "../shared/errors";
 import type { Role } from "../shared/roles";
@@ -19,6 +20,14 @@ export async function authenticate(req: Request, _res: Response, next: NextFunct
 
     const payload = jwt.verify(token, config.jwtSecret) as JwtPayload;
     if (!payload.sub) throw new UnauthorizedError();
+
+    if (config.demoMode) {
+      const user = getDemoAuthenticatedUser(payload.sub);
+      if (!user) throw new UnauthorizedError();
+      req.user = user;
+      next();
+      return;
+    }
 
     const employee = await EmployeeModel.findOne({ _id: payload.sub, isDeleted: false }).lean();
     if (!employee || employee.status !== "ACTIVE") throw new UnauthorizedError();

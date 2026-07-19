@@ -10,7 +10,7 @@ let bootstrapPromise: Promise<void> | undefined;
 async function bootstrapOnce(): Promise<void> {
   if (!bootstrapPromise) {
     bootstrapPromise = connectDatabase().then(async () => {
-      if (config.seedOnStart) await seedEmployees();
+      if (config.seedOnStart && !config.demoMode) await seedEmployees();
     });
   }
   return bootstrapPromise;

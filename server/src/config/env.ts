@@ -34,7 +34,8 @@ export const config = {
   jwtExpiresIn: stringEnv("JWT_EXPIRES_IN", "8h"),
   clientOrigin: stringEnv("CLIENT_ORIGIN", "http://localhost:5173"),
   defaultEmployeePassword: stringEnv("DEFAULT_EMPLOYEE_PASSWORD", "Welcome@123"),
-  seedOnStart: booleanEnv("SEED_ON_START", false)
+  seedOnStart: booleanEnv("SEED_ON_START", false),
+  demoMode: booleanEnv("DEMO_MODE", false)
 } as const;
 
 export const isProduction = config.nodeEnv === "production";

@@ -7,7 +7,7 @@ import { seedEmployees } from "./scripts/seed-data";
 
 async function bootstrap() {
   await connectDatabase();
-  if (config.seedOnStart) {
+  if (config.seedOnStart && !config.demoMode) {
     await seedEmployees();
   }
 
