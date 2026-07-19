@@ -34,6 +34,21 @@ export function createApp() {
   );
   app.use(express.json({ limit: "1mb" }));
 
+  app.get("/", (_req, res) =>
+    res.json({
+      name: "Employee Management System API",
+      status: "ok",
+      docs: "https://github.com/offlvenkatesh/employee-management-system/blob/main/docs/API.md",
+      endpoints: {
+        health: "/health",
+        ready: "/ready",
+        auth: "/api/auth/login",
+        employees: "/api/employees",
+        dashboard: "/api/dashboard/stats",
+        organization: "/api/organization/tree"
+      }
+    })
+  );
   app.get("/health", (_req, res) => res.json({ status: "ok" }));
   app.get("/ready", (_req, res) => {
     const ready = isDatabaseReady();
