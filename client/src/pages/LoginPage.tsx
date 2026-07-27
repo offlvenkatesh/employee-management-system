@@ -41,7 +41,7 @@ export function LoginPage() {
             <ShieldCheck size={18} className="text-clay" /> Secure RBAC workspace
           </div>
           <div>
-            <p className="label">Full-stack hiring assignment</p>
+            <p className="label">Employee Management System</p>
             <h1 className="mt-4 max-w-3xl text-5xl font-black tracking-tighter xl:text-6xl">
               Manage people, roles, and reporting lines from one calm control room.
             </h1>
